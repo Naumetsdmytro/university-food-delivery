@@ -1,41 +1,13 @@
-import { useCallback, useState } from 'react';
-import { Stack } from '@mui/material/';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/AppStore';
 import { ErrorBoundary, AppIconButton } from '../components';
 import { useOnMobile } from '../hooks/layout';
-import { BOTTOMBAR_DESKTOP_VISIBLE, TOPBAR_DESKTOP_HEIGHT, TOPBAR_MOBILE_HEIGHT } from './config';
+import { BOTTOMBAR_DESKTOP_VISIBLE } from './config';
 import { useEventSwitchDarkMode } from '../hooks/event';
-import TopBar from './TopBar';
-import SideBar from './SideBar';
 import BottomBar from './BottomBar';
+import { Stack, Tabs, Tab, AppBar, Toolbar, Container } from '@mui/material';
 
-// TODO: change to your app name or other word
-const TITLE_PUBLIC = '_TITLE_ app'; // Title for pages without/before authentication
-
-/**
- * SideBar navigation items with links
- */
-const SIDEBAR_ITEMS = [
-  {
-    title: 'Log In',
-    path: '/auth/login',
-    icon: 'login',
-  },
-  {
-    title: 'Sign Up',
-    path: '/auth/signup',
-    icon: 'signup',
-  },
-  {
-    title: 'About',
-    path: '/about',
-    icon: 'info',
-  },
-];
-
-/**
- * BottomBar navigation items with links
- */
 const BOTTOMBAR_ITEMS = [
   {
     title: 'Log In',
@@ -54,6 +26,13 @@ const BOTTOMBAR_ITEMS = [
   },
 ];
 
+const navigationItems = [
+  { label: 'Orders', path: '/orders' },
+  { label: 'Users', path: '/users' },
+  { label: 'Products', path: '/products' },
+  // Add more navigation items as needed
+];
+
 /**
  * Renders "Public Layout" composition
  * @component PublicLayout
@@ -61,79 +40,64 @@ const BOTTOMBAR_ITEMS = [
 const PublicLayout = ({ children }) => {
   const onMobile = useOnMobile();
   const onSwitchDarkMode = useEventSwitchDarkMode();
-  const [sideBarVisible, setSideBarVisible] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [state] = useAppStore();
   const bottomBarVisible = onMobile || BOTTOMBAR_DESKTOP_VISIBLE;
+  const navigate = useNavigate();
+  // Also Update Tab Title
 
-  // Variant 1 - Sidebar is static on desktop and is a drawer on mobile
-  // const sidebarOpen = onMobile ? sideBarVisible : true;
-  // const sidebarVariant = onMobile ? 'temporary' : 'persistent';
-
-  // Variant 2 - Sidebar is drawer on mobile and desktop
-  const sidebarOpen = sideBarVisible;
-  const sidebarVariant = 'temporary';
-
-  const title = TITLE_PUBLIC;
-  document.title = title; // Also Update Tab Title
-
-  const onSideBarOpen = useCallback(() => {
-    if (!sideBarVisible) setSideBarVisible(true); // Don't re-render Layout when SideBar is already open
-  }, [sideBarVisible]);
-
-  const onSideBarClose = useCallback(() => {
-    if (sideBarVisible) setSideBarVisible(false); // Don't re-render Layout when SideBar is already closed
-  }, [sideBarVisible]);
-
-  // console.log(
-  //   'Render using PublicLayout, onMobile:',
-  //   onMobile,
-  //   'sidebarOpen:',
-  //   sidebarOpen,
-  //   'sidebarVariant:',
-  //   sidebarVariant
-  // );
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+    navigate(navigationItems[newValue].path); // Navigate to the selected tab's path
+  };
 
   return (
     <Stack
       sx={{
-        minHeight: '100vh', // Full screen height
-        paddingTop: onMobile ? TOPBAR_MOBILE_HEIGHT : TOPBAR_DESKTOP_HEIGHT,
+        minHeight: '100vh',
+        // remove padding here if it's causing the top space
       }}
     >
-      <Stack component="header">
-        <TopBar
-          startNode={<AppIconButton icon="logo" onClick={onSideBarOpen} />}
-          title={title}
-          endNode={
+      <AppBar position="static">
+        <Container maxWidth="lg">
+          {' '}
+          {/* Use this container to center the content and set max width */}
+          <Toolbar disableGutters>
+            {' '}
+            {/* disableGutters removes the default padding */}
+            <AppIconButton icon="logo" />
+            Food delivery
+            <Tabs value={selectedTab} onChange={handleTabChange} centered sx={{ flex: 1 }}>
+              {navigationItems.map((item) => (
+                <Tab key={item.path} label={item.label} onClick={() => navigate(item.path)} />
+              ))}
+            </Tabs>
             <AppIconButton
-              // icon={state.darkMode ? 'day' : 'night'} // Variant 1
-              icon="daynight" // Variant 2
+              icon="daynight"
               title={state.darkMode ? 'Switch to Light mode' : 'Switch to Dark mode'}
               onClick={onSwitchDarkMode}
             />
-          }
-        />
+          </Toolbar>
+        </Container>
+      </AppBar>
 
-        <SideBar
-          anchor="left"
-          open={sidebarOpen}
-          variant={sidebarVariant}
-          items={SIDEBAR_ITEMS}
-          onClose={onSideBarClose}
-        />
-      </Stack>
+      {/* Wrap the main content in the same container to align with the AppBar */}
+      <Container maxWidth="lg" sx={{ marginTop: '24px' }}>
+        <Stack
+          component="main"
+          sx={{
+            flexGrow: 1,
+            padding: 1,
+          }}
+        >
+          <ErrorBoundary name="Content">{children}</ErrorBoundary>
+        </Stack>
+      </Container>
 
-      <Stack
-        component="main"
-        sx={{
-          flexGrow: 1, // Takes all possible space
-          padding: 1,
-        }}
-      >
-        <ErrorBoundary name="Content">{children}</ErrorBoundary>
-      </Stack>
-
-      <Stack component="footer">{bottomBarVisible && <BottomBar items={BOTTOMBAR_ITEMS} />}</Stack>
+      {/* If the bottom bar should also be within the same width, wrap it in a Container as well */}
+      <Container maxWidth="lg">
+        <Stack component="footer">{bottomBarVisible && <BottomBar items={BOTTOMBAR_ITEMS} />}</Stack>
+      </Container>
     </Stack>
   );
 };
