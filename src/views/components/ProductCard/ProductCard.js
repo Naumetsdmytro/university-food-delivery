@@ -9,7 +9,7 @@ import axios from 'axios';
 
 export const ProductCard = ({ title, description, price, imageUrl }) => {
   const handleButtonClick = async () => {
-    await axios.put('http://localhost:3003/api/selectedProducts/id', {
+    await axios.put('http://localhost:5000/api/selectedProducts/id', {
       title,
       price,
     });
@@ -26,7 +26,7 @@ export const ProductCard = ({ title, description, price, imageUrl }) => {
           minHeight: 360,
         }}
       >
-        <CardMedia component="img" height="256" image={imageUrl} alt="Fish and chips" />
+        <CardMedia component="img" height="256" src={imageUrl} alt="Fish and chips" />
         <CardContent>
           <Typography gutterBottom variant="p" component="h3" style={{ fontWeight: '500' }}>
             {title}

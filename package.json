@@ -39,9 +39,6 @@
     "web-vitals": "latest"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/react": "latest",
-    "@testing-library/user-event": "latest",
     "prettier": "latest"
   },
   "scripts": {
