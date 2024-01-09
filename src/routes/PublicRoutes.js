@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
-import AuthRoutes from '../views/Auth';
-import { AboutView, NotFoundView, UsersView } from '../views';
+import SignupView from '../views/Auth/Signup/Signup';
+import { AboutView, NotFoundView, UsersView, ProductsView, HomeView } from '../views';
 import LoginEmailView from '../views/Auth/Login/Email';
 
 /**
@@ -10,10 +10,12 @@ import LoginEmailView from '../views/Auth/Login/Email';
 const PublicRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<LoginEmailView />} />
-      <Route path="auth/*" element={<AuthRoutes />} />
+      <Route path="/" element={<HomeView />} />
+      <Route path="auth/login" element={<LoginEmailView />} />
+      <Route path="auth/signup" element={<SignupView />} />
       <Route path="about" element={<AboutView />} />
       <Route path="users" element={<UsersView />} />
+      <Route path="products" element={<ProductsView />} />
       <Route path="*" element={<NotFoundView />} />
     </Routes>
   );

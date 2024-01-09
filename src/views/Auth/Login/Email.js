@@ -1,11 +1,10 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, TextField, Card, CardHeader, CardContent, InputAdornment } from '@mui/material';
-import { useAppStore } from '../../../store';
-import { AppButton, AppIconButton, AppLink } from '../../../components';
+import { AppButton, AppIconButton } from '../../../components';
 import { AppForm, AppAlert } from '../../../components/forms';
 import { useAppForm, SHARED_CONTROL_PROPS, eventPreventDefault } from '../../../utils/form';
-import { api } from '../../../api';
+import axios from 'axios';
 
 const VALIDATE_FORM_LOGIN_EMAIL = {
   email: {
@@ -22,13 +21,8 @@ const VALIDATE_FORM_LOGIN_EMAIL = {
   },
 };
 
-/**
- * Renders "Login with Email" view for Login flow
- * url: /auth/login/email/*
- */
 const LoginEmailView = () => {
   const navigate = useNavigate();
-  const [, dispatch] = useAppStore();
   const [formState, , /* setFormState */ onFieldChange, fieldGetError, fieldHasError] = useAppForm({
     validationSchema: VALIDATE_FORM_LOGIN_EMAIL,
     initialValues: { email: '', password: '' },
@@ -45,16 +39,16 @@ const LoginEmailView = () => {
     async (event) => {
       event.preventDefault();
 
-      const result = await api?.auth?.login(values);
-      if (!result) {
-        setError('Please check email and password');
-        return; // Unsuccessful login
+      try {
+        // await axios.post('http://192.168.31.131:5000/api/users/login', {
+        //   ...values,
+        // });
+        navigate('/products', { replace: true });
+      } catch (error) {
+        setError('Signup failed: ' + (error.message || 'Unknown error'));
       }
-
-      dispatch({ type: 'LOG_IN' });
-      navigate('/', { replace: true });
     },
-    [dispatch, values, navigate]
+    [values, navigate]
   );
 
   const handleCloseError = useCallback(() => setError(undefined), []);
@@ -62,7 +56,7 @@ const LoginEmailView = () => {
   return (
     <AppForm onSubmit={handleFormSubmit}>
       <Card>
-        <CardHeader title="Login with Email" />
+        <CardHeader title="Login" sx={{ textAlign: 'center' }} />
         <CardContent>
           <TextField
             required
@@ -106,9 +100,6 @@ const LoginEmailView = () => {
           <Grid container justifyContent="center" alignItems="center">
             <AppButton type="submit" disabled={!formState.isValid}>
               Login with Email
-            </AppButton>
-            <AppButton variant="text" component={AppLink} to="/auth/recovery/password">
-              Forgot Password
             </AppButton>
           </Grid>
         </CardContent>

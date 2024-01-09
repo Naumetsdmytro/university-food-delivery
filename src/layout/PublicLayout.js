@@ -1,87 +1,73 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppStore } from '../store/AppStore';
-import { ErrorBoundary, AppIconButton } from '../components';
-import { useOnMobile } from '../hooks/layout';
-import { BOTTOMBAR_DESKTOP_VISIBLE } from './config';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ErrorBoundary } from '../components';
+import CartModal from '../views/components/CartModal';
 import { useEventSwitchDarkMode } from '../hooks/event';
-import BottomBar from './BottomBar';
-import { Stack, Tabs, Tab, AppBar, Toolbar, Container } from '@mui/material';
-
-const BOTTOMBAR_ITEMS = [
-  {
-    title: 'Log In',
-    path: '/auth/login',
-    icon: 'login',
-  },
-  {
-    title: 'Sign Up',
-    path: '/auth/signup',
-    icon: 'signup',
-  },
-  {
-    title: 'About',
-    path: '/about',
-    icon: 'info',
-  },
-];
+import { Stack, Tabs, Tab, AppBar, Toolbar, Container, Button } from '@mui/material';
+import logo from '../images/logo.svg';
+import sun from '../images/sun.svg';
+import cart from '../images/cart.svg';
 
 const navigationItems = [
+  { label: 'Home', path: '/' },
+  { label: 'About Us', path: '/about' },
   { label: 'Orders', path: '/orders' },
   { label: 'Users', path: '/users' },
   { label: 'Products', path: '/products' },
-  // Add more navigation items as needed
+  { label: 'Sign In', path: '/auth/login' },
+  { label: 'Sign Up', path: '/auth/signup' },
 ];
 
-/**
- * Renders "Public Layout" composition
- * @component PublicLayout
- */
 const PublicLayout = ({ children }) => {
-  const onMobile = useOnMobile();
   const onSwitchDarkMode = useEventSwitchDarkMode();
   const [selectedTab, setSelectedTab] = useState(0);
-  const [state] = useAppStore();
-  const bottomBarVisible = onMobile || BOTTOMBAR_DESKTOP_VISIBLE;
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-  // Also Update Tab Title
+  const location = useLocation();
+
+  useEffect(() => {
+    const currentIndex = navigationItems.findIndex((item) => item.path === location.pathname);
+
+    if (currentIndex !== -1) {
+      setSelectedTab(currentIndex);
+    }
+  }, [location.pathname]);
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
-    navigate(navigationItems[newValue].path); // Navigate to the selected tab's path
+    navigate(navigationItems[newValue].path);
+  };
+
+  const handleModalOpen = () => {
+    setIsModalOpen((oldValue) => {
+      return !oldValue;
+    });
   };
 
   return (
     <Stack
       sx={{
         minHeight: '100vh',
-        // remove padding here if it's causing the top space
       }}
     >
-      <AppBar position="static">
+      <AppBar position="static" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.15)' }}>
         <Container maxWidth="lg">
-          {' '}
-          {/* Use this container to center the content and set max width */}
           <Toolbar disableGutters>
-            {' '}
-            {/* disableGutters removes the default padding */}
-            <AppIconButton icon="logo" />
-            Food delivery
+            <img src={logo} alt="logo" width="25px" height="25px" />
+            Japan Symphony
             <Tabs value={selectedTab} onChange={handleTabChange} centered sx={{ flex: 1 }}>
               {navigationItems.map((item) => (
                 <Tab key={item.path} label={item.label} onClick={() => navigate(item.path)} />
               ))}
             </Tabs>
-            <AppIconButton
-              icon="daynight"
-              title={state.darkMode ? 'Switch to Light mode' : 'Switch to Dark mode'}
-              onClick={onSwitchDarkMode}
-            />
+            <Button onClick={handleModalOpen} color="inherit">
+              <img alt="cart" src={cart} width="25px" height="25px" />
+            </Button>
+            {isModalOpen && <CartModal isModalOpen={isModalOpen} onClose={handleModalOpen} />}
+            <img src={sun} onClick={onSwitchDarkMode} alt="switchTheme" width="25px" height="25px" />
           </Toolbar>
         </Container>
       </AppBar>
-
-      {/* Wrap the main content in the same container to align with the AppBar */}
       <Container maxWidth="lg" sx={{ marginTop: '24px' }}>
         <Stack
           component="main"
@@ -92,11 +78,6 @@ const PublicLayout = ({ children }) => {
         >
           <ErrorBoundary name="Content">{children}</ErrorBoundary>
         </Stack>
-      </Container>
-
-      {/* If the bottom bar should also be within the same width, wrap it in a Container as well */}
-      <Container maxWidth="lg">
-        <Stack component="footer">{bottomBarVisible && <BottomBar items={BOTTOMBAR_ITEMS} />}</Stack>
       </Container>
     </Stack>
   );

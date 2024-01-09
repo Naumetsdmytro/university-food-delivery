@@ -11,11 +11,10 @@ import {
   InputAdornment,
   LinearProgress,
 } from '@mui/material';
-import { useAppStore } from '../../../store';
 import { AppButton, AppIconButton } from '../../../components';
-import { AppForm, AppAlert } from '../../../components/forms';
+import { AppForm } from '../../../components/forms';
 import { useAppForm, SHARED_CONTROL_PROPS, eventPreventDefault } from '../../../utils/form';
-import { api } from '../../../api';
+import axios from 'axios';
 
 const VALIDATE_FORM_SIGNUP = {
   email: {
@@ -25,7 +24,7 @@ const VALIDATE_FORM_SIGNUP = {
   phone: {
     type: 'string',
     format: {
-      pattern: '^$|[- .+()0-9]+', // Note: We have to allow empty in the pattern
+      pattern: '^$|[- .+()0-9]+',
       message: 'should contain numbers',
     },
   },
@@ -33,7 +32,7 @@ const VALIDATE_FORM_SIGNUP = {
     type: 'string',
     presence: { allowEmpty: false },
     format: {
-      pattern: '^[A-Za-z ]+$', // Note: Allow only alphabets and space
+      pattern: '^[A-Za-z ]+$',
       message: 'should contain only alphabets',
     },
   },
@@ -41,7 +40,7 @@ const VALIDATE_FORM_SIGNUP = {
     type: 'string',
     presence: { allowEmpty: false },
     format: {
-      pattern: '^[A-Za-z ]+$', // Note: Allow only alphabets and space
+      pattern: '^[A-Za-z ]+$',
       message: 'should contain only alphabets',
     },
   },
@@ -67,54 +66,44 @@ const VALIDATE_EXTENSION = {
  */
 const SignupView = () => {
   const navigate = useNavigate();
-  const [, dispatch] = useAppStore();
   const [validationSchema, setValidationSchema] = useState({
     ...VALIDATE_FORM_SIGNUP,
     ...VALIDATE_EXTENSION,
   });
   const [formState, , /* setFormState */ onFieldChange, fieldGetError, fieldHasError] = useAppForm({
-    validationSchema: validationSchema, // the state value, so could be changed in time
+    validationSchema: validationSchema,
     initialValues: {
       firstName: '',
+      gender: '',
       lastName: '',
+      region: '',
       email: '',
       phone: '',
       password: '',
       confirmPassword: '',
+      DOB: '',
+      desiredRegion: '',
     },
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const values = formState.values; // Typed alias to formState.values as the "Source of Truth"
+  const [showCourierFields, setShowCourierFields] = useState(false);
+  const values = formState.values;
 
   useEffect(() => {
-    // Component Mount
-    let componentMounted = true;
-
-    async function fetchData() {
-      //TODO: Call any Async API here
-      if (!componentMounted) return; // Component was unmounted during the API call
-      //TODO: Verify API call here
-
-      setLoading(false); // Reset "Loading..." indicator
-    }
-    fetchData(); // Call API asynchronously
-
-    return () => {
-      // Component Un-mount
-      componentMounted = false;
+    const fetchData = async () => {
+      setLoading(false);
     };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
-    // Update Validation Schema when Show/Hide password changed
     let newSchema;
     if (showPassword) {
-      newSchema = VALIDATE_FORM_SIGNUP; // Validation without .confirmPassword
+      newSchema = VALIDATE_FORM_SIGNUP;
     } else {
-      newSchema = { ...VALIDATE_FORM_SIGNUP, ...VALIDATE_EXTENSION }; // Full validation
+      newSchema = { ...VALIDATE_FORM_SIGNUP, ...VALIDATE_EXTENSION };
     }
     setValidationSchema(newSchema);
   }, [showPassword]);
@@ -123,35 +112,34 @@ const SignupView = () => {
     setShowPassword((oldValue) => !oldValue);
   }, []);
 
-  const handleAgreeClick = useCallback(() => {
-    setAgree((oldValue) => !oldValue);
-  }, []);
-
   const handleFormSubmit = useCallback(
     async (event) => {
       event.preventDefault();
+      setLoading(true);
 
-      const apiResult = await api?.auth?.signup(values);
-
-      if (!apiResult) {
-        setError('Can not create user for given email, if you already have account please sign in');
-        return; // Unsuccessful signup
+      try {
+        // await axios.post('http://192.168.31.131:5000/api/users/register', {
+        //   ...values,
+        // });
+        console.log(values);
+        navigate('/login', { replace: true });
+      } finally {
+        setLoading(false);
       }
-
-      dispatch({ type: 'SIGN_UP' });
-      navigate('/', { replace: true });
     },
-    [dispatch, values, navigate]
+    [values, navigate]
   );
 
-  const handleCloseError = useCallback(() => setError(undefined), []);
+  const handleCourierRole = () => {
+    setShowCourierFields((prevState) => !prevState);
+  };
 
   if (loading) return <LinearProgress />;
 
   return (
     <AppForm onSubmit={handleFormSubmit}>
       <Card>
-        <CardHeader title="Sign Up" />
+        <CardHeader title="Sign Up" sx={{ textAlign: 'center' }} />
         <CardContent>
           <TextField
             required
@@ -217,32 +205,56 @@ const SignupView = () => {
               ),
             }}
           />
-          {!showPassword && (
-            <TextField
-              required
-              type="password"
-              label="Confirm Password"
-              name="confirmPassword"
-              value={values.confirmPassword}
-              error={fieldHasError('confirmPassword')}
-              helperText={fieldGetError('confirmPassword') || ' '}
-              onChange={onFieldChange}
-              {...SHARED_CONTROL_PROPS}
-            />
-          )}
-          <FormControlLabel
-            control={<Checkbox required name="agree" checked={agree} onChange={handleAgreeClick} />}
-            label="You must agree with Terms of Use and Privacy Policy to use our service *"
+          <TextField
+            required
+            label="Gender"
+            name="gender"
+            value={values.gender}
+            error={fieldHasError('gender')}
+            helperText={fieldGetError('gender') || ' '}
+            onChange={onFieldChange}
+            {...SHARED_CONTROL_PROPS}
           />
+          <TextField
+            required
+            label="Region"
+            name="region"
+            value={values.region}
+            error={fieldHasError('region')}
+            helperText={fieldGetError('region') || ' '}
+            onChange={onFieldChange}
+            {...SHARED_CONTROL_PROPS}
+          />
+          <FormControlLabel control={<Checkbox onChange={handleCourierRole} />} label="I am registering as a courier" />
 
-          {error ? (
-            <AppAlert severity="error" onClose={handleCloseError}>
-              {error}
-            </AppAlert>
-          ) : null}
+          {showCourierFields && (
+            <>
+              <TextField
+                required
+                type="date"
+                label="DOB"
+                name="DOB"
+                value={values.DOB}
+                error={fieldHasError('DOB')}
+                helperText={fieldGetError('DOB') || ' '}
+                onChange={onFieldChange}
+                {...SHARED_CONTROL_PROPS}
+              />
+              <TextField
+                required
+                label="Desired Region"
+                name="desiredRegion"
+                value={values.desiredRegion}
+                error={fieldHasError('desiredRegion')}
+                helperText={fieldGetError('desiredRegion') || ' '}
+                onChange={onFieldChange}
+                {...SHARED_CONTROL_PROPS}
+              />
+            </>
+          )}
 
           <Grid container justifyContent="center" alignItems="center">
-            <AppButton type="submit" disabled={!(formState.isValid && agree)}>
+            <AppButton type="submit" disabled={!formState.isValid}>
               Confirm and Sign Up
             </AppButton>
           </Grid>
