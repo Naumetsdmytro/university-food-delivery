@@ -21,9 +21,50 @@ export const CartModal = ({ onClose, isModalOpen }) => {
 
   return (
     <Dialog open={isModalOpen} onClose={onClose}>
-      <DialogTitle>Shopping Cart</DialogTitle>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <DialogTitle
+          style={{
+            textAlign: 'center',
+          }}
+        >
+          Shopping Cart
+        </DialogTitle>
+        <Button onClick={onClose} color="primary">
+          <img alt="closeIcon" src={closeIcon} width="25px" height="25px" />
+        </Button>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <h3
+          style={{
+            marginRight: '135px',
+          }}
+        >
+          Dish
+        </h3>
+        <h3
+          style={{
+            marginRight: '100px',
+          }}
+        >
+          Count
+        </h3>
+        <h3>Price</h3>
+      </div>
       <DialogContent>
-        {[{ title: 'sushi', price: '35$', id: '7erg32yrf4' }].map((item) => (
+        {[
+          { title: 'Sushi', count: '3', price: '35$', id: '7erg32yrf4' },
+          { title: 'Ramen', count: '1', price: '50$', id: '7erg32yf4' },
+        ].map((item) => (
           <div
             key={item.id}
             style={{
@@ -31,31 +72,46 @@ export const CartModal = ({ onClose, isModalOpen }) => {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '8px',
-              backgroundColor: 'red',
               borderBottom: '1px solid #ccc',
             }}
           >
             <h3
               style={{
                 flex: 1,
-                marginRight: '16px',
                 fontWeight: 'bold',
-                color: 'red',
+                marginRight: '130px',
               }}
             >
               {item.title}
             </h3>
             <div
               style={{
-                minWidth: '60px',
+                marginRight: '130px',
+                fontWeight: 'bold',
+              }}
+            >
+              {item.count}
+            </div>
+            <div
+              style={{
+                fontWeight: 'bold',
               }}
             >
               {item.price}
             </div>
           </div>
         ))}
-        <Button onClick={onClose} color="primary">
-          <img alt="closeIcon" src={closeIcon} width="25px" height="25px" />
+        <Button
+          onClick={onClose}
+          color="primary"
+          style={{
+            marginTop: '30px',
+            width: '100%',
+            backgroundColor: 'mediumpurple',
+            color: 'white',
+          }}
+        >
+          Proceed to payment
         </Button>
       </DialogContent>
     </Dialog>
