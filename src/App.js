@@ -2,6 +2,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AppStoreProvider } from './store';
 import { AppThemeProvider } from './theme';
 import { AppSnackBarProvider } from './components/AppSnackBar';
+import { ContextProvider } from './context';
 import Routes from './routes';
 import Layout from './layout';
 import { ErrorBoundary } from './components';
@@ -18,11 +19,13 @@ const App = () => {
         <IdleTimer />
         <AppThemeProvider>
           <AppSnackBarProvider>
-            <BrowserRouter>
-              <Layout>
-                <Routes />
-              </Layout>
-            </BrowserRouter>
+            <ContextProvider>
+              <BrowserRouter>
+                <Layout>
+                  <Routes />
+                </Layout>
+              </BrowserRouter>
+            </ContextProvider>
           </AppSnackBarProvider>
         </AppThemeProvider>
       </AppStoreProvider>

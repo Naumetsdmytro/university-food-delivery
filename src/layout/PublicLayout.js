@@ -1,27 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from '../components';
 import CartModal from '../views/components/CartModal';
 import { useEventSwitchDarkMode } from '../hooks/event';
+import { useGlobalContext } from '../context';
 import { Stack, Tabs, Tab, AppBar, Toolbar, Container, Button } from '@mui/material';
 import logo from '../images/logo.svg';
-import sun from '../images/sun.svg';
-import cart from '../images/cart.svg';
-
-const navigationItems = [
-  { label: 'Home', path: '/' },
-  { label: 'About Us', path: '/about' },
-  { label: 'Orders', path: '/orders' },
-  { label: 'Users', path: '/users' },
-  { label: 'Products', path: '/products' },
-  { label: 'Sign In', path: '/auth/login' },
-  { label: 'Sign Up', path: '/auth/signup' },
-];
+import sun from '../images/sunny.png';
+import cart from '../images/trolley.png';
 
 const PublicLayout = ({ children }) => {
   const onSwitchDarkMode = useEventSwitchDarkMode();
   const [selectedTab, setSelectedTab] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showCourierFields, setShowCourierFields] = useState(false);
+  const {
+    userData: { role },
+  } = useGlobalContext();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -32,6 +27,29 @@ const PublicLayout = ({ children }) => {
       setSelectedTab(currentIndex);
     }
   }, [location.pathname]);
+
+  const navigationItems = useMemo(() => {
+    const items = [
+      { label: 'Home', path: '/' },
+      { label: 'About Us', path: '/about' },
+    ];
+
+    if (role === 'admin') {
+      items.push({ label: 'Users', path: '/users' });
+    }
+
+    if (role && role !== 'user') {
+      items.push({ label: 'Orders', path: '/orders' });
+    }
+
+    if (role) {
+      items.push({ label: 'Products', path: '/products' });
+    }
+
+    items.push({ label: 'Sign In', path: '/auth/login' }, { label: 'Sign Up', path: '/auth/signup' });
+
+    return items;
+  }, [role]);
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -57,7 +75,7 @@ const PublicLayout = ({ children }) => {
             Japan Symphony
             <Tabs value={selectedTab} onChange={handleTabChange} centered sx={{ flex: 1 }}>
               {navigationItems.map((item) => (
-                <Tab key={item.path} label={item.label} onClick={() => navigate(item.path)} />
+                <Tab key={item.path} label={item.label.toUpperCase()} onClick={() => navigate(item.path)} />
               ))}
             </Tabs>
             <Button onClick={handleModalOpen} color="inherit">

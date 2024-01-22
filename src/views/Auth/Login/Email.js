@@ -5,6 +5,7 @@ import { AppButton, AppIconButton } from '../../../components';
 import { AppForm, AppAlert } from '../../../components/forms';
 import { useAppForm, SHARED_CONTROL_PROPS, eventPreventDefault } from '../../../utils/form';
 import axios from 'axios';
+import { useGlobalContext } from '../../../context';
 
 const VALIDATE_FORM_LOGIN_EMAIL = {
   email: {
@@ -22,6 +23,7 @@ const VALIDATE_FORM_LOGIN_EMAIL = {
 };
 
 const LoginEmailView = () => {
+  const { setUserData } = useGlobalContext();
   const navigate = useNavigate();
   const [formState, , /* setFormState */ onFieldChange, fieldGetError, fieldHasError] = useAppForm({
     validationSchema: VALIDATE_FORM_LOGIN_EMAIL,
@@ -40,9 +42,10 @@ const LoginEmailView = () => {
       event.preventDefault();
 
       try {
-        // await axios.post('http://192.168.31.131:5000/api/users/login', {
-        //   ...values,
-        // });
+        const userData = await axios.post('http://192.168.31.131:5000/api/users/login', {
+          ...values,
+        });
+        setUserData(userData);
         navigate('/products', { replace: true });
       } catch (error) {
         setError('Signup failed: ' + (error.message || 'Unknown error'));

@@ -10,8 +10,8 @@ export const ProductsList = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://192.168.31.131:5000/api/product');
-        setProducts(response.data);
+        // const response = await axios.get('http://192.168.31.131:5000/api/product');
+        // setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -22,8 +22,18 @@ export const ProductsList = () => {
 
   return (
     <ul className={styles.productsList}>
-      {products.map(({ id, title, description, imageUrl, price }) => {
-        return <ProductCard key={id} title={title} description={description} price={price} imageUrl={imageUrl} />;
+      {[
+        {
+          id: 'rn2ui3qwdewd4r43iowrfn',
+          title: 'Sushi',
+          description: 'ifnveuirwnifnw ewfuiewnrfnewfuiewniuwenf',
+          imageUrl: 'ncwiuef',
+          price: '40',
+        },
+      ].map(({ id, title, description, imageUrl, price }) => {
+        return (
+          <ProductCard key={id} id={id} title={title} description={description} price={price} imageUrl={imageUrl} />
+        );
       })}
     </ul>
   );

@@ -1,0 +1,124 @@
+.deleteButton {
+  border: none;
+  background-color: #fff;
+}
+
+.deleteButton:hover {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+/* CartModal.module.css */
+
+.dialogPaper {
+  max-width: 600px; /* Adjust the modal width as needed */
+  border-radius: 10px; /* Rounded corners for the modal */
+}
+
+.dialogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f9f9f9; /* Light grey background for the header */
+}
+
+.dialogTitle {
+  color: #333; /* Dark grey color for the title text */
+  flex-grow: 1;
+  font-size: 1.5rem; /* Larger text for the title */
+}
+
+.closeButton {
+  padding: 8px;
+  margin: -8px;
+  color: #333; /* Dark grey color for the close icon */
+}
+
+.dialogContent {
+  padding: 16px;
+}
+
+.columnHeaders {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  margin-bottom: 16px; /* More space below the headers */
+  border-bottom: 2px solid #e0e0e0; /* Slightly thicker bottom border for the headers */
+  font-size: 0.9rem; /* Smaller text for the headers */
+  color: #555; /* Medium grey for the header text */
+}
+
+.dishHeader {
+  flex: 2; /* Allocate more space for the dish name */
+  padding-right: 16px; /* Spacing to the right of the dish header */
+}
+
+.countHeader {
+  flex-basis: 50px; /* Fixed width for the count */
+  text-align: center; /* Center the count header */
+}
+
+.priceHeader {
+  flex-basis: 70px; /* Fixed width for the price */
+  text-align: right; /* Align the price header to the right */
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee; /* Light grey border for each item */
+}
+
+.itemTitle {
+  flex: 2; /* Allocate more space for the dish name */
+  padding-right: 16px; /* Spacing to the right of the dish name */
+  font-weight: 500; /* Semi-bold for the dish name */
+}
+
+.itemCount {
+  flex-basis: 50px;
+  text-align: center; /* Center the count text */
+}
+
+.itemPrice {
+  flex-basis: 70px;
+  text-align: right; /* Align the price text to the right */
+  padding-right: 24px; /* Spacing to the right of the price */
+}
+
+.deleteButton {
+  padding: 8px;
+  margin: -8px;
+  color: #999; /* Medium grey for the delete icon */
+}
+
+.proceedButton {
+  margin-top: 30px;
+  width: 100%;
+  background-color: mediumpurple;
+  color: white;
+  padding: 12px 0;
+  border: none;
+  border-radius: 4px; /* Rounded corners for the button */
+  font-size: 1rem; /* Standard text size for button */
+  font-weight: 500; /* Semi-bold for the button text */
+  text-transform: none; /* Remove uppercase transformation */
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1); /* Subtle shadow for the button */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.proceedButton:hover {
+  background-color: rebeccapurple; /* Slightly darker purple on hover */
+}
+
+@media (max-width: 640px) {
+  .dialogPaper {
+    max-width: 100%;
+    margin: 20px;
+    height: calc(100% - 40px); /* Full-screen modal on small screens */
+  }
+}

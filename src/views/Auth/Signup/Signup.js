@@ -15,6 +15,7 @@ import { AppButton, AppIconButton } from '../../../components';
 import { AppForm } from '../../../components/forms';
 import { useAppForm, SHARED_CONTROL_PROPS, eventPreventDefault } from '../../../utils/form';
 import axios from 'axios';
+import { useGlobalContext } from '../../../context';
 
 const VALIDATE_FORM_SIGNUP = {
   email: {
@@ -87,7 +88,6 @@ const SignupView = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showCourierFields, setShowCourierFields] = useState(false);
   const values = formState.values;
 
   useEffect(() => {
@@ -129,6 +129,8 @@ const SignupView = () => {
     },
     [values, navigate]
   );
+
+  const showPagesForSpecificRole = () => {};
 
   const handleCourierRole = () => {
     setShowCourierFields((prevState) => !prevState);
@@ -226,32 +228,27 @@ const SignupView = () => {
             {...SHARED_CONTROL_PROPS}
           />
           <FormControlLabel control={<Checkbox onChange={handleCourierRole} />} label="I am registering as a courier" />
-
-          {showCourierFields && (
-            <>
-              <TextField
-                required
-                type="date"
-                label="DOB"
-                name="DOB"
-                value={values.DOB}
-                error={fieldHasError('DOB')}
-                helperText={fieldGetError('DOB') || ' '}
-                onChange={onFieldChange}
-                {...SHARED_CONTROL_PROPS}
-              />
-              <TextField
-                required
-                label="Desired Region"
-                name="desiredRegion"
-                value={values.desiredRegion}
-                error={fieldHasError('desiredRegion')}
-                helperText={fieldGetError('desiredRegion') || ' '}
-                onChange={onFieldChange}
-                {...SHARED_CONTROL_PROPS}
-              />
-            </>
-          )}
+          <TextField
+            required
+            type="date"
+            label="DOB"
+            name="DOB"
+            value={values.DOB}
+            error={fieldHasError('DOB')}
+            helperText={fieldGetError('DOB') || ' '}
+            onChange={onFieldChange}
+            {...SHARED_CONTROL_PROPS}
+          />
+          <TextField
+            required
+            label="Desired Region"
+            name="desiredRegion"
+            value={values.desiredRegion}
+            error={fieldHasError('desiredRegion')}
+            helperText={fieldGetError('desiredRegion') || ' '}
+            onChange={onFieldChange}
+            {...SHARED_CONTROL_PROPS}
+          />
 
           <Grid container justifyContent="center" alignItems="center">
             <AppButton type="submit" disabled={!formState.isValid}>

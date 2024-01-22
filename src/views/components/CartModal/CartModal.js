@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import closeIcon from '../../../images/closeIcon.svg';
-import axios from 'axios';
+import binIcon from '../../../images/bin 18.35.38.svg';
+import styles from './CartModal.module.css';
 
 export const CartModal = ({ onClose, isModalOpen }) => {
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    async function fetchSelectedItems() {
-      try {
-        const result = await axios.get('http://localhost:3003/api/selectedProducts/id');
-        setCartItems(result.data);
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-      }
-    }
-
-    fetchSelectedItems();
+    const currentSelectedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+    setCartItems(currentSelectedProducts);
   }, []);
+
+  let totalPrice = 0;
 
   return (
     <Dialog open={isModalOpen} onClose={onClose}>
@@ -61,46 +56,49 @@ export const CartModal = ({ onClose, isModalOpen }) => {
         <h3>Price</h3>
       </div>
       <DialogContent>
-        {[
-          { title: 'Sushi', count: '3', price: '35$', id: '7erg32yrf4' },
-          { title: 'Ramen', count: '1', price: '50$', id: '7erg32yf4' },
-        ].map((item) => (
-          <div
-            key={item.id}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '8px',
-              borderBottom: '1px solid #ccc',
-            }}
-          >
-            <h3
-              style={{
-                flex: 1,
-                fontWeight: 'bold',
-                marginRight: '130px',
-              }}
-            >
-              {item.title}
-            </h3>
+        {cartItems.map((item) => {
+          totalPrice += Number(item.price);
+          return (
             <div
+              key={item.id}
               style={{
-                marginRight: '130px',
-                fontWeight: 'bold',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '8px',
+                borderBottom: '1px solid #ccc',
               }}
             >
-              {item.count}
+              <h3
+                style={{
+                  flex: 1,
+                  fontWeight: 'bold',
+                  marginRight: '130px',
+                }}
+              >
+                {item.title}
+              </h3>
+              <div
+                style={{
+                  marginRight: '130px',
+                  fontWeight: 'bold',
+                }}
+              >
+                {item.count}
+              </div>
+              <div
+                style={{
+                  fontWeight: 'bold',
+                  marginRight: '20px',
+                }}
+              >
+                {item.price}
+              </div>
+              <DeleteButton id={item.id} setCartItems={setCartItems} />
             </div>
-            <div
-              style={{
-                fontWeight: 'bold',
-              }}
-            >
-              {item.price}
-            </div>
-          </div>
-        ))}
+          );
+        })}
+        <p>Total: {totalPrice}</p>
         <Button
           onClick={onClose}
           color="primary"
@@ -118,4 +116,20 @@ export const CartModal = ({ onClose, isModalOpen }) => {
   );
 };
 
-// export default CartModal;
+const DeleteButton = ({ id, setCartItems }) => {
+  const handleButtonClick = (evt) => {
+    const storedData = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+    const indexToDelete = storedData.findIndex((product) => product.id === id);
+
+    if (indexToDelete !== -1) {
+      storedData.splice(indexToDelete, 1);
+      localStorage.setItem('selectedProducts', JSON.stringify(storedData));
+      setCartItems(storedData);
+    }
+  };
+  return (
+    <button variant="contained" size="small" onClick={handleButtonClick} className={styles.deleteButton}>
+      <img width="20px" height="20px" src={binIcon} alt="bin"></img>
+    </button>
+  );
+};

@@ -5,14 +5,26 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import axios from 'axios';
 
-export const ProductCard = ({ title, description, price, imageUrl }) => {
+export const ProductCard = ({ title, description, price, imageUrl, id }) => {
   const handleButtonClick = async () => {
-    await axios.put('http://localhost:5000/api/selectedProducts/id', {
-      title,
-      price,
-    });
+    try {
+      const currentSelectedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+      const productIndex = currentSelectedProducts.findIndex((product) => product.title === title);
+
+      if (productIndex !== -1) {
+        currentSelectedProducts[productIndex].count += 1;
+        currentSelectedProducts[productIndex].price =
+          Number(currentSelectedProducts[productIndex].price) + Number(price);
+      } else {
+        const newProduct = { title, price, id, count: 1 };
+        currentSelectedProducts.push(newProduct);
+      }
+
+      localStorage.setItem('selectedProducts', JSON.stringify(currentSelectedProducts));
+    } catch (error) {
+      console.error('Error while updating selected products:', error);
+    }
   };
 
   return (
